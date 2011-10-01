@@ -108,7 +108,7 @@ GapSocket.nextIndex = -1;
 
 GapSocket.prototype.send = function(data)
 {
-	PhoneGap.exec("GapSocketCommand.send",this.sockId,data + "\r\n");
+	PhoneGap.exec("GapSocketCommand.send",this.sockId,data );
 }
 
 GapSocket.prototype.close = function()

@@ -89,7 +89,7 @@
 		if(argc > 1)
 		{
 			NSString* message = [arguments objectAtIndex:1];
-			BOOL foundSocket = NO;
+			BOOL foundSocket = NO;							
 			int socketCount = [connectedSockets count];
 			for(int x = 0; x < socketCount; x++)
 			{
@@ -100,7 +100,7 @@
 					
 					[sock writeData:msgData withTimeout:-1 tag:0];
 					
-					[sock readDataToData:[AsyncSocket CRLFData] withTimeout:-1 tag:0];
+					[sock readDataToData:[AsyncSocket GTData] withTimeout:-1 tag:0];
 					foundSocket = YES;
 					break;
 				}
@@ -192,7 +192,7 @@
 	[jsString release];
 	
 	[connectedSockets addObject:sock];
-	[sock readDataToData:[AsyncSocket CRLFData] withTimeout:-1 tag:0];
+	[sock readDataToData:[AsyncSocket GTData] withTimeout:-1 tag:0];
 }
 
 /**
@@ -201,11 +201,17 @@
  **/
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-	NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
+	NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 0)];
 	NSString *msg = [[[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding] autorelease];
+    //NSLog(@"here:%@", msg);
+
 	if(msg)
 	{
-		NSString* jsString = [[NSString alloc] initWithFormat:@"GapSocket.__onMessage(\"%d\",\"%@\");",[sock userData] , msg ];
+        msg = [ msg stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+		msg = [ msg stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+		//NSLog(@"%@", msgA);
+        //msg = [ msg stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString* jsString = [[NSString alloc] initWithFormat:@"GapSocket.__onMessage('%d','%@');",[sock userData] , msg ];
 		[self.webView stringByEvaluatingJavaScriptFromString:jsString];
 		[jsString release];
 	}
